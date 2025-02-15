@@ -1,6 +1,8 @@
 import requests
 from pprint import pprint
 from bs4 import BeautifulSoup
+from llm_modelito import LLMJsonExtractor
+import json
 
 sercoplus = {
     'targer': ".product-miniature.js-product-miniature",
@@ -63,29 +65,38 @@ def get_items(soup: BeautifulSoup, target_group_items: str, target_pagination: s
     
     empty_pagination = True if not select_pagination else False
     
-    print(empty_pagination, type(empty_pagination))
     return items_list, empty_pagination
 
+def save_data_json(name_file: str, data: list)->None:
+     with open(name_file, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
 
 def main():
     urlx = 'https://www.impacto.com.pe/catalogo?categoria=Accesorios%20para%20Laptop&c=30&page='
     url = 'https://www.sercoplus.com/266-PromoPlus?page='
     num_page = 1
     empty_pagination = False
-    target_group_items = impacto['targer']
-    target_pagination = impacto['targer_pagination']
+    target_group_items = sercoplus['targer']
+    target_pagination = sercoplus['targer_pagination']
+    model = LLMJsonExtractor()
+    name_file = 'modelito_prueba xddx.json'
+    list_result = []
     while not empty_pagination:
         
-        new_url = f'{urlx}{num_page}'
+        new_url = f'{url}{num_page}'
         page_result = get_page(new_url)
         data_result, empty_pagination = get_items(page_result, target_group_items, target_pagination)
         
         print(f'link de la pagina: {new_url}')
         
         for data in data_result:
-            print(data)
+            result = model.extract_json(data)
+            print(result)
+            list_result.append(result)
             
         num_page = num_page + 1
+        
+    save_data_json(name_file,list_result)
 
 if '__main__' == __name__:
     main()
