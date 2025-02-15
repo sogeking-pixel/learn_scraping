@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+*.json
+*.txt
+
+
 # Extensiones en C
 *.so
 
@@ -93,5 +97,3 @@ venv.bak/
 .DS_Store
 Thumbs.db
 
-*.json
-*.txt
