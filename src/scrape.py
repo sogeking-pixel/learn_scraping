@@ -1,29 +1,10 @@
 import requests
-from pprint import pprint
 from bs4 import BeautifulSoup
-from llm_modelito import LLMJsonExtractor
 import json
 
-sercoplus = {
-    'targer': ".product-miniature.js-product-miniature",
-    'targer_pagination': '.next.js-search-link'
-}
+separator_start = '_'*8 +'inicio de datos:\n\n' 
+separator_end = '\nfin de datos' + '_'*8  
 
-impacto = {
-    'targer': ".single-product",
-    'targer_pagination': 'ul.pagination li:last-child a[class="page-link"]'
-}
-
-struct_data = {
-    'name': '.product-name',
-    'url_product': '.product-cover-link',
-    'price_dollar': '.price.product-price.currency2',
-    'url_img': None,
-    'stock':'.price.product-price.stock-mini',
-    'is_discount':None,
-    'value_discount':None,
-    'type_discount':None,
-}
 
 def get_page(url: str):
     response = requests.get(url=url)
@@ -70,33 +51,3 @@ def get_items(soup: BeautifulSoup, target_group_items: str, target_pagination: s
 def save_data_json(name_file: str, data: list)->None:
      with open(name_file, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
-
-def main():
-    urlx = 'https://www.impacto.com.pe/catalogo?categoria=Accesorios%20para%20Laptop&c=30&page='
-    url = 'https://www.sercoplus.com/266-PromoPlus?page='
-    num_page = 1
-    empty_pagination = False
-    target_group_items = sercoplus['targer']
-    target_pagination = sercoplus['targer_pagination']
-    model = LLMJsonExtractor()
-    name_file = 'modelito_prueba xddx.json'
-    list_result = []
-    while not empty_pagination:
-        
-        new_url = f'{url}{num_page}'
-        page_result = get_page(new_url)
-        data_result, empty_pagination = get_items(page_result, target_group_items, target_pagination)
-        
-        print(f'link de la pagina: {new_url}')
-        
-        for data in data_result:
-            result = model.extract_json(data)
-            print(result)
-            list_result.append(result)
-            
-        num_page = num_page + 1
-        
-    save_data_json(name_file,list_result)
-
-if '__main__' == __name__:
-    main()
