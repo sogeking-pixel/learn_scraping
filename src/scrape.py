@@ -33,8 +33,8 @@ def extract_link(item) -> str:
     return link_str
 
 
-def get_items(soup: BeautifulSoup, target_group_items: str, target_pagination: str) -> tuple[list, bool]:
-    select_items = soup.select(target_group_items)
+def get_items(soup: BeautifulSoup, target_group: str, target_pagination: str) -> tuple[list, bool]:
+    select_items = soup.select(target_group)
     items_list = []
     for item in select_items:
         value_item =  item.get_text(strip=True, separator='\n')
@@ -47,6 +47,32 @@ def get_items(soup: BeautifulSoup, target_group_items: str, target_pagination: s
     empty_pagination = True if not select_pagination else False
     
     return items_list, empty_pagination
+
+
+def get_items_custom(soup: BeautifulSoup, target_group: str, target_pagination: str, target_item: dict)->tuple[list,bool]:
+    select_items = soup.select(target_group)
+    items_list = []
+    
+    for item in select_items:
+        items_data = {}
+        for key, css_selection in target_item.items():
+            value_element = item.select_one(css_selection)
+            
+            if not value_element:
+                items_data[key] = None
+                continue 
+            
+            items_data[key] = value_element.get_text(strip=True, separator='\n')
+            
+        items_list.append(items_data)
+        
+    select_pagination = soup.select(target_pagination)
+    
+    empty_pagination = True if not select_pagination else False
+    
+    return items_list, empty_pagination
+
+
 
 def save_data_json(name_file: str, data: list)->None:
      with open(name_file, "w", encoding="utf-8") as f:
