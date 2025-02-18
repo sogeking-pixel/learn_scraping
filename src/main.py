@@ -70,22 +70,29 @@ def scrape_plus_ia():
 def scrape_plus_manual():
     if not initialize_store('impacto'):
         return
-    name_file = 'impacto_custom.json'
+    name_file = 'impacto_custon.json'
     list_result = []
     
     for url in urls:
         num_page = 1
         empty_pagination = False
-        while not empty_pagination and num_page <= 10 :
-            new_url = f'{url}{page}{num_page}'
+        while not empty_pagination:
+            new_url = url if num_page == 1 else f'{url}{page}{num_page}'
+            
             page_result = get_page(new_url)
-            data_result, empty_pagination = get_items_custom(page_result, target_group, target_pagination, target_item)
             
             print(f'link de la pagina: {new_url}')
+            
+            if not page_result:
+                print(f'❌ Error: No se proceso correcamtne la pagina{new_url}')
+                break
+            
+            data_result, empty_pagination = get_items_custom(page_result, target_group, target_pagination, target_item)
             
             list_result.extend(data_result)
             
             num_page = num_page + 1
+            
         
         save_data_json(name_file,list_result)
     
