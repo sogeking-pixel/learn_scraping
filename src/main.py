@@ -70,7 +70,7 @@ def scrape_plus_ia():
 def scrape_plus_manual():
     if not initialize_store('impacto'):
         return
-    name_file = 'impacto_custon.json'
+    name_file = 'impacto_custon_expresion_regular.json'
     list_result = []
     
     for url in urls:

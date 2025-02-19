@@ -1,6 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
+from bs4 import Tag
 import json
+import re
 
 
 def get_page(url: str):
@@ -47,8 +49,59 @@ def get_items(soup: BeautifulSoup, target_group: str, target_pagination: str) ->
     
     return items_list, empty_pagination
 
-def get_link():
-    pass
+def clear_space_line(text: str) -> str:
+    return text.replace(" ", "").replace("\n", "")
+
+
+def get_symbol_value(symbol_expression: str, text: str) -> tuple[str, str] | tuple[None, None]:
+    pattern = rf"({symbol_expression}).*?((\d{{1,3}}(?:(?:,\d{{3}})+(?:\.\d{{2}})?)|(?:(?:\.\d{{3}})+(?:,\d{{2}})?)|\d+(?:(,|\.)\d{{2}})?))"
+    match = re.search(pattern, text)
+    if not match:
+        return None, None
+    return match.group(1), match.group(2)
+
+
+def get_data(value_element: Tag, key: str) -> dict:
+    if key == "value_discount":
+        result = {
+            "is_discount": False,
+            "value_discount": None,
+            "type_discount": None
+        }
+        if not value_element:
+            return result
+
+        value_text = clear_space_line(value_element.get_text(strip=True, separator='\n'))
+        symbol, discount_value = get_symbol_value(r'\$|\%', value_text)
+        result["is_discount"] = True
+        result["value_discount"] = discount_value
+        result["type_discount"] = "dollar" if symbol == '$' else ("porcent" if symbol == '%' else None)
+        return result
+
+    def parse_text(elem: Tag, regex: str = None) -> str | None:
+        if not elem:
+            return None
+        text = clear_space_line(elem.get_text(strip=True, separator='\n'))
+        if regex:
+            _, value = get_symbol_value(regex, text)
+            return value
+        return text
+
+    if key == "price_dollar":
+        return {key: parse_text(value_element, r'\$')}
+    elif key == "price_soles":
+        return {key: parse_text(value_element, r'S/')}
+    elif key == "stock":
+        if not value_element:
+            return {key: None}
+        text = clear_space_line(value_element.get_text(strip=True, separator='\n'))
+        match = re.search(r'(<|>|\+|)(\d+)', text)
+        if not match:
+            return {key: None}
+        symbol, value =  match.group(1), match.group(2)
+        return {key: symbol + value}
+    else:
+        return {key: parse_text(value_element)}
 
 def get_items_custom(soup: BeautifulSoup, target_group: str, target_pagination: str, target_item: dict)->tuple[list,bool]:
     select_items = soup.select(target_group)
@@ -61,16 +114,12 @@ def get_items_custom(soup: BeautifulSoup, target_group: str, target_pagination: 
             attribute = target.get("attribute") 
 
             value_element = item.select_one(selector)
-            
-            if not value_element:
-                items_data[key] = None
-                continue
 
             if attribute:
                 items_data[key] = value_element.get(attribute)
                 continue
             
-            items_data[key] = value_element.get_text(strip=True, separator='\n')
+            items_data.update( get_data(value_element, key) ) 
 
             
         items_list.append(items_data)
