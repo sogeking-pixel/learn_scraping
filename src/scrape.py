@@ -60,6 +60,21 @@ def get_symbol_value(symbol_expression: str, text: str) -> tuple[str, str] | tup
         return None, None
     return match.group(1), match.group(2)
 
+def parse_number(input_str)->float:
+    pattern_float_english = r'^((\d{1,3}(,\d{3})*)|\d+)(\.\d{2})?$'
+    pattern_float_europe = r'^((\d{1,3}(\.\d{3})*)|\d+)(,\d{2})?$'
+    
+    input_str = input_str.strip()
+    
+    if re.search(pattern_float_english, input_str):
+        clean_str = input_str.replace(',', '')
+        return round(float(clean_str), 2)
+        
+    if re.search(pattern_float_europe, input_str):
+        clean_str = input_str.replace('.', '').replace(',', '.')
+        return round(float(clean_str), 2)
+        
+    return 0.0
 
 def get_data(value_element: Tag, key: str) -> dict:
     if key == "value_discount":
@@ -74,7 +89,7 @@ def get_data(value_element: Tag, key: str) -> dict:
         value_text = clear_space_line(value_element.get_text(strip=True, separator='\n'))
         symbol, discount_value = get_symbol_value(r'\$|\%', value_text)
         result["is_discount"] = True
-        result["value_discount"] = discount_value
+        result["value_discount"] = parse_number(discount_value)
         result["type_discount"] = "dollar" if symbol == '$' else ("porcent" if symbol == '%' else None)
         return result
 
@@ -88,9 +103,13 @@ def get_data(value_element: Tag, key: str) -> dict:
         return text
 
     if key == "price_dollar":
-        return {key: parse_text(value_element, r'\$')}
+        result = parse_text(value_element, r'\$')
+        result_float = parse_number(result)
+        return {key: result_float}
     elif key == "price_soles":
-        return {key: parse_text(value_element, r'S/')}
+        result = parse_text(value_element, r'S/')
+        result_float = parse_number(result)
+        return {key: result_float}
     elif key == "stock":
         if not value_element:
             return {key: None}
