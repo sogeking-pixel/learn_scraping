@@ -13,13 +13,15 @@ target_item = {}
 def initialize_store(name_store: str)->bool:
     global urls, page, target_group, target_pagination, target_item
     
-    store = load_data()
+    store = load_data('json/info_store.json')
     if not store:
         return False
     
     store = store[name_store]
    
-    urls =  store['urls']
+    urls =  load_data( store['urls_file'])
+    if not urls:
+        return False
     page = store['page']    
     target_group = store['target_group']
     target_pagination = store['target_pagination']
@@ -28,11 +30,11 @@ def initialize_store(name_store: str)->bool:
     return True
 
 
-def load_data()-> dict:
-    with open('json/info_store.json', 'r', encoding='utf-8') as file:
+def load_data(name_file: str):
+    with open(name_file, 'r', encoding='utf-8') as file:
         datos = json.load(file)
         return datos
-    return {}
+    return None
 
 
 def scrape_plus_ia():
@@ -68,9 +70,10 @@ def scrape_plus_ia():
     
 
 def scrape_plus_manual():
-    if not initialize_store('impacto'):
+    store_name = 'memorykings'
+    if not initialize_store(store_name):
         return
-    name_file = 'impacto_custon_expresion_regular.json'
+    name_file = f'data_products/{store_name}.json'
     list_result = []
     
     for url in urls:

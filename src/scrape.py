@@ -60,7 +60,7 @@ def get_symbol_value(symbol_expression: str, text: str) -> tuple[str, str] | tup
         return None, None
     return match.group(1), match.group(2)
 
-def parse_number(input_str)->float:
+def parse_number(input_str)->float | None:
     pattern_float_english = r'^((\d{1,3}(,\d{3})*)|\d+)(\.\d{2})?$'
     pattern_float_europe = r'^((\d{1,3}(\.\d{3})*)|\d+)(,\d{2})?$'
     
@@ -74,7 +74,7 @@ def parse_number(input_str)->float:
         clean_str = input_str.replace('.', '').replace(',', '.')
         return round(float(clean_str), 2)
         
-    return 0.0
+    return None
 
 def get_data(value_element: Tag, key: str) -> dict:
     if key == "value_discount":
@@ -89,7 +89,7 @@ def get_data(value_element: Tag, key: str) -> dict:
         value_text = clear_space_line(value_element.get_text(strip=True, separator='\n'))
         symbol, discount_value = get_symbol_value(r'\$|\%', value_text)
         result["is_discount"] = True
-        result["value_discount"] = parse_number(discount_value)
+        result["value_discount"] = parse_number(discount_value) if discount_value else None
         result["type_discount"] = "dollar" if symbol == '$' else ("porcent" if symbol == '%' else None)
         return result
 
@@ -135,7 +135,9 @@ def get_items_custom(soup: BeautifulSoup, target_group: str, target_pagination: 
             value_element = item.select_one(selector)
 
             if attribute:
-                items_data[key] = value_element.get(attribute)
+                prefix = target.get("prefix") if target.get("prefix") else ""
+                url = prefix + value_element.get(attribute)
+                items_data[key] = url
                 continue
             
             items_data.update( get_data(value_element, key) ) 
