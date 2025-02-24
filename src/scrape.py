@@ -120,7 +120,7 @@ def get_data(value_element: Tag, key: str) -> dict:
         symbol, value =  match.group(1), match.group(2)
         return {key: symbol + value}
     else:
-        return {key: parse_text(value_element)}
+        return {key: value_element.get_text(strip=True, separator='\n') if value_element else None}
 
 def get_items_custom(soup: BeautifulSoup, target_group: str, target_pagination: str, target_item: dict)->tuple[list,bool]:
     select_items = soup.select(target_group)

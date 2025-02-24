@@ -69,8 +69,7 @@ def scrape_plus_ia():
     
     
 
-def scrape_plus_manual():
-    store_name = 'memorykings'
+def scrape_plus_manual(store_name: str):
     if not initialize_store(store_name):
         return
     name_file = f'data_products/{store_name}.json'
@@ -104,4 +103,7 @@ def scrape_plus_manual():
 
 if __name__ == '__main__':
     # scrape_plus_ia()
-    scrape_plus_manual()
+    store_name = ['sercoplus', 'impacto', 'memorykings']
+    for store in store_name:
+        print(f'se esta procesando la tienda: {store}')
+        scrape_plus_manual(store)
