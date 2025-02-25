@@ -1,0 +1,98 @@
+{
+  "impacto": {
+    "urls_file": "json/urls_impacto.json",
+    "page": "?page=",
+    "target_group": ".single-product",
+    "target_pagination": "ul.pagination li:last-child a[class=\"page-link\"]",
+    "target_item": {
+      "name": {
+        "selector": ".single-product .product-title a"
+      },
+      "url_product": {
+        "selector": ".single-product .product-title a",
+        "attribute": "href"
+      },
+      "price_dollar": {
+        "selector": ".single-product .product-price .price-sale-2"
+      },
+      "price_soles": {
+        "selector": ".single-product .product-price .price-sale-2"
+      },
+      "url_img": {
+        "selector": ".single-product .product-image a img",
+        "attribute": "src"
+      },
+      "stock": {
+        "selector": ".single-product .detail span:last-child"
+      },
+      "value_discount": {
+        "selector": ".single-product .product-image .ofert-product"
+      }
+    }
+  },
+
+  "sercoplus": {
+    "urls_file": "json/urls_sercoplus.json",
+    "page": "?page=",
+    "target_group": ".product-miniature.js-product-miniature",
+    "target_pagination": ".next.js-search-link",
+    "target_item": {
+      "name": {
+        "selector": ".second-third-block .second-block .product-name a"
+      },
+      "url_product": {
+        "selector": ".first-block .product-thumbnail a",
+        "attribute": "href"
+      },
+      "price_dollar": {
+        "selector": ".product-price-and-shipping .first-prices .product-price"
+      },
+      "price_soles": {
+        "selector": ".product-price-and-shipping .first-prices .product-price"
+      },
+      "url_img": {
+        "selector": ".first-block .product-thumbnail a img",
+        "attribute": "src"
+      },
+      "stock": {
+        "selector": ".first-prices .stock-mini"
+      },
+      "value_discount": {
+        "selector": ".product-flags .product-flag.discount"
+      }
+    }
+  },
+
+  "memorykings": {
+    "urls_file": "json/urls_memorykings.json",
+    "page": "&pagina=",
+    "target_group": "ul.products.flex li",
+    "target_pagination": "ul.pager li:last-child a:not(.active)",
+    "target_item": {
+      "name": {
+        "selector": "li a .content .title"
+      },
+      "url_product": {
+        "selector": "li a",
+        "attribute": "href",
+        "prefix": "https://www.memorykings.pe"
+      },
+      "price_dollar": {
+        "selector": "li a .content .price"
+      },
+      "price_soles": {
+        "selector": "li a .content .price"
+      },
+      "url_img": {
+        "selector": "li a .image img",
+        "attribute": "src"
+      },
+      "stock": {
+        "selector": "li a .content .stock"
+      },
+      "value_discount": {
+        "selector": "li a .content .promo.oferta"
+      }
+    }
+  }
+}
