@@ -5,6 +5,7 @@ __pycache__/
 
 *.json
 !info_store.json
+!urls_*.json
 *.txt
 
 
